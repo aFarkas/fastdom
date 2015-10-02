@@ -18,12 +18,15 @@
 </style>
 </head>
 <body>
-  <label>Number of elements <input id="input" type="text" value="100" /></label>
+  <label>Number of elements <input id="input" type="text" value="300" /></label>
   <button id="withoutFastDom">Run without FastDom</button>
   <button id="withRequestAnimationFrame">Run with requestAnimationFrame</button>
   <button id="withFastDom">Run with FastDom</button>
+  <button id="withFastDomWithoutRead">Run with FastDom - without read</button>
   <button id="resetbtn">reset</button>
+  <label><input type="checkbox" id="animate" /> animate</label>
   <section id="perf"></section>
+  <div style="width: 300px; height: 300px;" id="fxbox"></div>
   <section id="container"></section>
   <script type="text/javascript" src="../index.js"></script>
   <script>
@@ -62,17 +65,15 @@
       var isLast = i === (n - 1);
 
       // READ
+      var h = div.clientWidth * aspect;
+
+      // WRITE
       requestAnimationFrame(function() {
-        var h = div.clientWidth * aspect;
+        div.style.height = h + 'px';
 
-        // WRITE
-        requestAnimationFrame(function() {
-          div.style.height = h + 'px';
-
-          if (isLast) {
-            displayPerf(performance.now() - start);
-          }
-        });
+        if (isLast) {
+          displayPerf(performance.now() - start);
+        }
       });
     }
 
@@ -95,26 +96,91 @@
       });
     }
 
+    function setAspectFastDomWithoutRead(div, i) {
+      var aspect = 9/16;
+      var isLast = i === (n - 1);
+      var h = div.clientWidth * aspect;
+
+      // WRITE
+      fastdom.write(function() {
+        div.style.height = h + 'px';
+
+        if (isLast) {
+          displayPerf(performance.now() - start);
+        }
+      });
+    }
+
     function displayPerf(ms) {
       perf.textContent = ms + 'ms';
     }
 
     withoutFastDom.onclick = function() {
       reset();
-      start = performance.now();
-      divs.forEach(setAspect);
+
+      requestAnimationFrame(function(){
+        setTimeout(function(){
+          start = performance.now();
+          divs.forEach(setAspect);
+        });
+      });
+
     };
 
     withFastDom.onclick = function() {
       reset();
-      start = performance.now();
-      divs.forEach(setAspectFastDom);
+
+      requestAnimationFrame(function(){
+        setTimeout(function(){
+          start = performance.now();
+          divs.forEach(setAspectFastDom);
+        });
+      });
+    };
+
+    withFastDomWithoutRead.onclick = function(){
+      //the reset function is actually a write and should be
+      reset();
+
+      requestAnimationFrame(function(){
+        setTimeout(function(){
+          start = performance.now();
+          divs.forEach(setAspectFastDomWithoutRead);
+        });
+      });
     };
 
     withRequestAnimationFrame.onclick = function() {
       reset();
-      start = performance.now();
-      divs.forEach(setAspectRequestAnimationFrame);
+      requestAnimationFrame(function(){
+        setTimeout(function(){
+          start = performance.now();
+          divs.forEach(setAspectRequestAnimationFrame);
+        });
+      });
+
+    };
+
+    var animateBox = (function(){
+      var start = 300;
+      var dir = 1;
+      return function(){
+        start += dir;
+        fxbox.style.width = start +'px';
+
+        if(start > 600 || start < 100){
+          dir *= -1;
+        }
+        if(animate.checked){
+          requestAnimationFrame(animateBox);
+        }
+      }
+    })();
+
+    animate.onclick = function(){
+      if(this.checked){
+        animateBox();
+      }
     };
 
     resetbtn.onclick = reset;
