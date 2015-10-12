@@ -23,6 +23,7 @@
 					setTimeout(this._flushReads);
 				}
 			} else {
+				//use setImmediate/Promise approach here to make it still async???
 				fn.apply(ctx || null, args);
 			}
 		},
