@@ -2,7 +2,6 @@
 	'use strict';
 
 	var rAF = window.requestAnimationFrame || setTimeout;
-	var setImmediate = window.setImmediate || setTimeout;
 
 	var Fastdom = function(){
 		this._reads = [];
@@ -21,7 +20,7 @@
 				this._reads.push(arguments);
 				if(!this._waitsForRead){
 					this._waitsForRead = true;
-					setImmediate(this._flushReads);
+					setTimeout(this._flushReads);
 				}
 			} else {
 				fn.apply(ctx || null, args);
