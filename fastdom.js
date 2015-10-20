@@ -358,12 +358,13 @@ function clearAll(fastdom, tasks) {
 }
 
 function createPromise(executer) {
+  var promise;
   var isResolved;
   var value;
   var cbs;
 
   if (window.Promise) {
-    return new Promise(executer);
+    promise = new Promise(executer);
   } else {
     // simple sync thenable implementation
     cbs = [];
@@ -373,16 +374,20 @@ function createPromise(executer) {
       while (cbs.length) cbs.shift()(value);
     });
 
-    return {
+    promise = {
       then: function(cb) {
         if (isResolved) {
           cb(value);
         } else {
           cbs.push(cb);
         }
+
+        return promise;
       }
     };
   }
+
+  return promise;
 }
 
 /**
