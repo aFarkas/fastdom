@@ -376,7 +376,7 @@ function createPromise(executer) {
     return {
       then: function(cb) {
         if (isResolved) {
-          cb.call(this, value);
+          cb.call(window, value);
         } else {
           cbs.push(cb);
         }
