@@ -12,6 +12,8 @@
  */
 
 'use strict';
+/* globals Promise */
+
 /**
  * Mini logger
  *
@@ -326,7 +328,14 @@ Sandbox.prototype.clear = function(task) {
   FastDom.prototype[method] = FastDom.prototype[alias] = Sandbox.prototype[method] = Sandbox.prototype[alias] = function(fn, ctx) {
     var _this = this;
     return function() {
-      _this[names[0]](fn, ctx || this, arguments);
+      var fnThis = ctx || this;
+      var args = arguments;
+
+      return createPromise(function(resolve) {
+        _this[names[0]](function() {
+          resolve(fn.apply(fnThis, args));
+        });
+      });
     };
   };
 });
@@ -345,6 +354,34 @@ function clearAll(fastdom, tasks) {
   for (var i = 0, l = tasks.length; i < l; i++) {
     fastdom.clear(tasks[i]);
     tasks.splice(i, 1);
+  }
+}
+
+function createPromise(executer) {
+  var isResolved;
+  var value;
+  var cbs;
+
+  if (window.Promise) {
+    return new Promise(executer);
+  } else {
+    // simple sync thenable implementation
+    cbs = [];
+    executer.call(window, function(val) {
+      value = val;
+      isResolved = true;
+      while (cbs.length) cbs.shift().call(window, value);
+    });
+
+    return {
+      then: function(cb) {
+        if (isResolved) {
+          cb.call(this, value);
+        } else {
+          cbs.push(cb);
+        }
+      }
+    };
   }
 }
 
