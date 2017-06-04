@@ -28,6 +28,11 @@
   <section id="perf"></section>
   <div style="width: 300px; height: 300px;" id="fxbox"></div>
   <section id="container"></section>
+  <script src="https://afarkas.github.io/strictdom/strictdom.js"></script>
+  <script>
+      strictdom.enable();
+      strictdom.throwLevel = 5;
+  </script>
   <script type="text/javascript" src="../index.js"></script>
   <script>
     var n;
@@ -116,9 +121,10 @@
     }
 
     withoutFastDom.onclick = function() {
-      reset();
+
 
       requestAnimationFrame(function(){
+        reset();
         setTimeout(function(){
           start = performance.now();
           divs.forEach(setAspect);
@@ -128,9 +134,10 @@
     };
 
     withFastDom.onclick = function() {
-      reset();
+
 
       requestAnimationFrame(function(){
+        reset();
         setTimeout(function(){
           start = performance.now();
           divs.forEach(setAspectFastDom);
@@ -140,9 +147,8 @@
 
     withFastDomWithoutRead.onclick = function(){
       //the reset function is actually a write and should be
-      reset();
-
       requestAnimationFrame(function(){
+        reset();
         setTimeout(function(){
           start = performance.now();
           divs.forEach(setAspectFastDomWithoutRead);
@@ -151,8 +157,9 @@
     };
 
     withRequestAnimationFrame.onclick = function() {
-      reset();
+
       requestAnimationFrame(function(){
+        reset();
         setTimeout(function(){
           start = performance.now();
           divs.forEach(setAspectRequestAnimationFrame);

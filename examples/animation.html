@@ -2,6 +2,12 @@
 <html>
 	<head>
 		<title>FastDom: Animation Example</title>
+		<script src="https://afarkas.github.io/strictdom/strictdom.js"></script>
+		<script>
+			strictdom.enable();
+            strictdom.throwLevel = 5;
+		</script>
+
 		<script type="text/javascript" src="../index.js"></script>
 	</head>
 	<body>
@@ -30,7 +36,7 @@
 		</style>
 
 		<div class="intro">An adaptation of the demo from the Google Developers article <a href="https://developers.google.com/chrome-developer-tools/docs/demos/too-much-layout/">Diagnosing forced synchronous layouts</a>. In the article, forced synchronous layouts are fixed by simply <em>not doing any reads at all</em>. Rather than this extreme solution, which will not be appropriate for many use cases, we instead use <strong>fastdom</strong> to intelligently defer and batch the DOM reads and writes, and get similar performance gains as a result.</div>
-		<label>Number of elements <input id="count" type="text" value="400" /></label>
+		<label>Number of elements <input id="count" type="text" value="40" /></label>
 		<button id="sync" class="active">Forced synchronous layout</button>
 		<button id="async">Run with FastDom</button>
 		<button id="noread">No DOM reads</button>
